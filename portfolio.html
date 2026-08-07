@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daksh Chaudhary — Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #FAFAF8;
+    --ink: #14213D;
+    --steel: #5B6472;
+    --amber: #F2A541;
+    --hairline: #E1E1DC;
+    --white: #FFFFFF;
+
+    --display: 'Space Grotesk', sans-serif;
+    --body: 'Space Grotesk', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html { scroll-behavior:smooth; }
+
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    font-size:18px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a { color:inherit; text-decoration:none; }
+
+  ::selection{ background:var(--amber); color:var(--ink); }
+
+  /* ---------- status strip ---------- */
+  .status-strip{
+    position:sticky; top:0; z-index:50;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 32px;
+    background:var(--ink); color:var(--paper);
+    font-family:var(--mono); font-size:11px; letter-spacing:.04em;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .status-strip .dot{
+    display:inline-block; width:6px; height:6px; border-radius:50%;
+    background:var(--amber); margin-right:8px;
+    box-shadow:0 0 0 3px rgba(242,165,65,.2);
+  }
+  .status-strip .right{ opacity:.75; }
+  @media (max-width:640px){ .status-strip .right{ display:none; } }
+
+  section{ padding:120px 40px; max-width:1120px; margin:0 auto; }
+  @media (max-width:640px){ section{ padding:72px 24px; } }
+
+  .eyebrow{
+    font-family:var(--mono); font-size:12px; letter-spacing:.12em;
+    color:var(--steel); text-transform:uppercase; margin-bottom:16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{
+    content:''; width:24px; height:1px; background:var(--steel);
+  }
+
+  /* ---------- hero ---------- */
+  .hero{
+    padding-top:120px; padding-bottom:120px;
+    border-bottom:1px solid var(--hairline);
+  }
+  .hero .callsign{
+    font-family:var(--mono); font-size:13px; color:var(--steel);
+    margin-bottom:24px; letter-spacing:.06em;
+  }
+  .hero h1{
+    font-family:var(--display); font-weight:700;
+    font-size:clamp(2.6rem, 6vw, 4.6rem);
+    line-height:1.05; letter-spacing:-.02em;
+    max-width:14ch;
+  }
+  .hero .role{
+    font-family:var(--display); font-weight:500;
+    font-size:clamp(1.1rem, 2vw, 1.4rem);
+    color:var(--steel); margin-top:20px; max-width:38ch;
+  }
+  .hero .bio{
+    margin-top:28px; max-width:52ch; font-size:16px; color:var(--ink);
+    opacity:.85;
+  }
+  .hero .cta-row{
+    margin-top:40px; display:flex; gap:14px; flex-wrap:wrap;
+  }
+  .btn{
+    font-family:var(--mono); font-size:13px; letter-spacing:.02em;
+    padding:13px 22px; border:1px solid var(--ink); border-radius:2px;
+    transition:background .18s ease, color .18s ease, transform .18s ease;
+  }
+  .btn.primary{ background:var(--ink); color:var(--paper); }
+  .btn.primary:hover{ background:var(--amber); border-color:var(--amber); color:var(--ink); transform:translateY(-1px); }
+  .btn.ghost:hover{ background:var(--ink); color:var(--paper); transform:translateY(-1px); }
+
+  /* ---------- about ---------- */
+  .about-grid{
+    display:grid; grid-template-columns:1.3fr 1fr; gap:64px;
+    border-bottom:1px solid var(--hairline);
+    padding-bottom: 24px;
+  }
+  @media (max-width:720px){ .about-grid{ grid-template-columns:1fr; gap:32px; } }
+  .about-grid p{ max-width:56ch; font-size:16px; color:var(--ink); opacity:.85; }
+  .about-grid p + p{ margin-top:16px; }
+
+  .stack{ display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+  .stack span{
+    font-family:var(--mono); font-size:12px;
+    border:1px solid var(--hairline); border-radius:2px;
+    padding:6px 10px; color:var(--steel);
+  }
+  .facts{ font-family:var(--mono); font-size:13px; color:var(--steel); }
+  .facts dt{ margin-top:14px; color:var(--ink); }
+  .facts dt:first-child{ margin-top:0; }
+  .facts dd{ opacity:.75; }
+
+  /* ---------- experience ---------- */
+  .experience{ border-bottom:1px solid var(--hairline); }
+  .timeline{ display:flex; flex-direction:column; }
+  .timeline-item{
+    display:grid; grid-template-columns:140px 1fr;
+    gap:24px; padding:26px 0; border-top:1px solid var(--hairline);
+  }
+  .timeline-item:last-child{ border-bottom:1px solid var(--hairline); }
+  @media (max-width:640px){ .timeline-item{ grid-template-columns:1fr; gap:6px; } }
+  .timeline-item .period{
+    font-family:var(--mono); font-size:13px; color:var(--steel); padding-top:3px;
+  }
+  .timeline-item h3{ font-family:var(--display); font-weight:600; font-size:19px; }
+  .timeline-item .org{ font-family:var(--mono); font-size:12px; color:var(--amber); margin-top:4px; letter-spacing:.04em; }
+  .timeline-item p{ margin-top:8px; font-size:15px; color:var(--steel); max-width:56ch; }
+
+  /* ---------- travelog ---------- */
+  .travelog{ border-bottom:1px solid var(--hairline); }
+
+  /* ---------- now ---------- */
+  .now{ border-bottom:1px solid var(--hairline); }
+  .now-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:32px; margin-top:8px; }
+  @media (max-width:720px){ .now-grid{ grid-template-columns:1fr; } }
+  .now-card .label{ font-family:var(--mono); font-size:11px; color:var(--amber); letter-spacing:.08em; text-transform:uppercase; }
+  .now-card h3{ font-family:var(--display); font-weight:600; font-size:18px; margin-top:10px; }
+  .now-card p{ font-size:14.5px; color:var(--steel); margin-top:8px; }
+
+
+  .projects{ border-bottom:1px solid var(--hairline); }
+  .project-list{ display:flex; flex-direction:column; }
+  .project{
+    display:grid; grid-template-columns:120px 1fr auto;
+    gap:24px; align-items:start;
+    padding:28px 0; border-top:1px solid var(--hairline);
+    transition:padding-left .2s ease;
+  }
+  .project:hover{ padding-left:8px; }
+  .project:last-child{ border-bottom:1px solid var(--hairline); }
+  @media (max-width:640px){ .project{ grid-template-columns:1fr; gap:8px; } }
+  .project .tag{
+    font-family:var(--mono); font-size:11px; color:var(--amber);
+    letter-spacing:.06em; padding-top:4px;
+  }
+  .project h3{
+    font-family:var(--display); font-weight:600; font-size:19px;
+  }
+  .project p{ margin-top:6px; font-size:14.5px; color:var(--steel); max-width:48ch; }
+  .project .link{
+    font-family:var(--mono); font-size:12px; color:var(--ink);
+    border-bottom:1px solid var(--ink); white-space:nowrap; height:fit-content;
+    padding-top:4px;
+  }
+
+  /* ---------- aviation log ---------- */
+  .log{ border-bottom:1px solid var(--hairline); }
+  .log-header{ display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:12px; margin-bottom:32px; }
+  .log-header p{ font-size:14.5px; color:var(--steel); max-width:44ch; }
+  .log-table{ width:100%; border-collapse:collapse; font-family:var(--mono); font-size:13px; }
+  .log-table th{
+    text-align:left; font-weight:500; color:var(--steel);
+    text-transform:uppercase; letter-spacing:.06em; font-size:11px;
+    padding-bottom:10px; border-bottom:1px solid var(--hairline);
+  }
+  .log-table td{
+    padding:12px 0; border-bottom:1px solid var(--hairline);
+    color:var(--ink);
+  }
+  .log-table td:first-child{ color:var(--amber); }
+  .log-table tr:last-child td{ border-bottom:none; }
+  .log-table .muted{ color:var(--steel); }
+
+  /* ---------- contact / footer ---------- */
+  .contact{ text-align:left; }
+  .contact h2{
+    font-family:var(--display); font-weight:700;
+    font-size:clamp(2rem, 4.5vw, 3rem); max-width:16ch; letter-spacing:-.01em;
+  }
+  .contact .sub{ margin-top:16px; color:var(--steel); max-width:46ch; font-size:15.5px; }
+  .contact .links{ margin-top:36px; display:flex; flex-wrap:wrap; gap:28px; }
+  .contact .links a{
+    font-family:var(--mono); font-size:14px; border-bottom:1px solid var(--hairline);
+    padding-bottom:2px; transition:border-color .18s ease, color .18s ease;
+  }
+  .contact .links a:hover{ border-color:var(--amber); color:var(--amber); }
+
+  footer{
+    padding:28px 32px; display:flex; justify-content:space-between;
+    font-family:var(--mono); font-size:11px; color:var(--steel);
+    letter-spacing:.03em; flex-wrap:wrap; gap:8px;
+  }
+
+  /* scroll reveal */
+  .reveal{ opacity:0; transform:translateY(16px); transition:opacity .6s ease, transform .6s ease; }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    .reveal{ opacity:1; transform:none; transition:none; }
+    .project, .btn{ transition:none; }
+  }
+
+  :focus-visible{ outline:2px solid var(--amber); outline-offset:2px; }
+</style>
+</head>
+<body>
+
+  <div class="status-strip">
+    <span><span class="dot"></span>STATUS: OPEN TO WORK</span>
+    <span class="right" id="clock">DEL 28.61°N 77.21°E · --:--:-- UTC</span>
+  </div>
+
+  <section class="hero">
+    <div class="callsign">DAKSH CHAUDHARY // STUDENT & SOFTWARE ENGINEER, BASED IN DELHI</div>
+    <h1>I build software with the same care I watch aircraft climb out.</h1>
+    <p class="role">Student & full-stack engineer. Amateur plane spotter. Occasional maker of things that don't need to exist but are fun anyway.</p>
+    <p class="bio">I'm a student and software engineer who loves building things — from backend systems to polished user experiences. I'm constantly learning, experimenting, and taking on projects that push me to grow as a developer. Outside of coding, I'm an aviation enthusiast with a fascination for airplanes, flight operations, and aerospace technology. Whether I'm writing code, exploring new technologies, or reading about aviation, I'm always driven by curiosity and a desire to understand how things work.</p>
+    <div class="cta-row">
+      <a class="btn primary" href="javascript:void(0)" data-scroll="projects">View work</a>
+      <a class="btn ghost" href="javascript:void(0)" data-scroll="contact">Get in touch</a>
+    </div>
+  </section>
+
+  <section class="about reveal">
+    <div class="eyebrow">About</div>
+    <div class="about-grid">
+      <div>
+        <p>I started programming in 5th grade by building a simple website out of curiosity. That curiosity turned into years of learning through long-term courses, personal projects, and constantly exploring new technologies. Today, I'm focused on becoming a better software engineer while diving deeper into AI and building products that solve real problems.</p>
+        <p>Outside of coding, aviation has always been a huge interest of mine. I enjoy learning about aircraft and flight operations, tracking flights, and spending time around airports whenever I get the chance.</p>
+        <div class="stack">
+          <span>JavaScript</span><span>React</span><span>HTML</span><span>Python</span><span>CSS</span>
+        </div>
+      </div>
+      <dl class="facts">
+        <dt>Based in</dt><dd>Delhi, India</dd>
+        <dt>Studying</dt><dd>///Searching For An University</dd>
+        <dt>Currently</dt><dd>Building An Website for a NGO</dd>
+        <dt>Goal</dt><dd>Try to be the best version of myself</dd>
+        <dt>Interests</dt><dd>Aviation, badimation, flight tracking, Formula 1</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="experience reveal">
+    <div class="eyebrow">Experience</div>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="period">2022 — 2024</div>
+        <div>
+          <h3>CEO</h3>
+          <div class="org">OPTIMUS LOOP</div>
+          <p>Co-founded a studio building mobile games, focused on hyper-casual titles. Submitted prototypes to Voodoo and Supersonic, with several accepted.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="projects reveal" id="projects">
+    <div class="eyebrow">Selected work</div>
+    <div class="project-list">
+      <div class="project">
+        <div class="tag">DISCORD BOT · IN DEVELOPMENT</div>
+        <div>
+          <h3>Discord Organizer Bot</h3>
+          <p>A Discord bot that helps people organize things and creates a more user-friendly experience inside Discord. Currently under active development.</p>
+        </div>
+        <span class="link" style="border-bottom:1px dashed var(--steel); color:var(--steel); cursor:default;">In progress</span>
+      </div>
+      <div class="project">
+        <div class="tag">SOCIAL PLATFORM</div>
+        <div>
+          <h3>Kwitter</h3>
+          <p>A place for people to join and talk — currently working on making the UI a lot better.</p>
+        </div>
+        <a class="link" href="https://github.com/dakshc3109/kwitterProject" target="_blank" rel="noopener noreferrer">View →</a>
+      </div>
+      <div class="project">
+        <div class="tag">AI INTEGRATED · WEB GAME</div>
+        <div>
+          <h3>AI Mario</h3>
+          <p>Developed an AI-enhanced Mario game based on the Linuk Mario codebase. Integrated computer vision and facial tracking to enable hands-free gameplay by translating the player's facial movements into in-game controls.</p>
+        </div>
+        <a class="link" href="https://dakshc3109.github.io/aimario/" target="_blank" rel="noopener noreferrer">View →</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="log reveal">
+    <div class="log-header">
+      <div class="eyebrow" style="margin-bottom:0;">Spotting log</div>
+    </div>
+    <table class="log-table">
+      <thead>
+        <tr><th>Aircraft</th><th>Where</th><th>Note</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>A350-900</td><td class="muted">DEL</td><td>Twin-engine widebody, sharp cockpit lighting</td></tr>
+        <tr><td>A380</td><td class="muted">DEL</td><td>Hard to miss on final approach</td></tr>
+        <tr><td>A321neo</td><td class="muted">Kathmandu, Nepal</td><td>Delhi–Kathmandu route, mountain approach</td></tr>
+        <tr><td>A320neo</td><td class="muted">DEL</td><td>Most common narrow-body at DEL</td></tr>
+        <tr><td>A320ceo</td><td class="muted">Ahmedabad</td><td>Older CEO variant, still going strong</td></tr>
+        <tr><td>737 MAX 8</td><td class="muted">Indore Airport</td><td>Newer MAX variant on a domestic route</td></tr>
+        <tr><td>787 Dreamliner</td><td class="muted">Mumbai</td><td>Composite widebody, dimmable windows</td></tr>
+        <tr><td>777-300ER</td><td class="muted">Lucknow</td><td>Long-haul workhorse on a domestic hop</td></tr>
+        <tr><td>Rafale</td><td class="muted">NCR region</td><td>IAF's newest multirole fighter</td></tr>
+        <tr><td>Tejas</td><td class="muted">NCR region</td><td>Indian LCA, distinct low-altitude pass</td></tr>
+        <tr><td>Sukhoi</td><td class="muted">Flying over NCR region</td><td>Su-30MKI, unmistakable engine roar</td></tr>
+        <tr><td>C-17 Globemaster III</td><td class="muted">Hindon Airport</td><td>Heavy-lift military transport</td></tr>
+        <tr><td>C-130J Super Hercules</td><td class="muted">Hindon Airport</td><td>Tactical airlifter, short-field capable</td></tr>
+        <tr><td>DA42</td><td class="muted">IGRUA, Uttar Pradesh</td><td>Diamond twin-prop trainer, light and nimble</td></tr>
+        <tr><td>Cessna 172</td><td class="muted">Delhi Flying Club, Safdarjung</td><td>The classic trainer, still everywhere</td></tr>
+        <tr><td>Embraer 100</td><td class="muted">Kanpur Airport</td><td>Compact regional jet</td></tr>
+        <tr><td>Gulfstream G550</td><td class="muted">DEL, GA terminal</td><td>Business jet, unmistakable long nose</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="travelog reveal">
+    <div class="log-header">
+      <div class="eyebrow" style="margin-bottom:0;">Travelog</div>
+    </div>
+    <table class="log-table">
+      <thead>
+        <tr><th>Destination</th><th>Date</th><th>Note</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Leh</td><td class="muted">2022</td><td>One of the highest commercial airports in the world</td></tr>
+        <tr><td>Ladakh</td><td class="muted">2022</td><td>High-altitude desert, unlike anywhere else in India</td></tr>
+        <tr><td>Pangong Lake</td><td class="muted">2022</td><td>That blue is real, not a filter</td></tr>
+        <tr><td>Nepal</td><td class="muted">2022</td><td>Himalayan views from the window seat</td></tr>
+        <tr><td>Shimla</td><td class="muted">2023</td><td>Hill station, toy train worth the detour</td></tr>
+        <tr><td>Kandaghat</td><td class="muted">2023</td><td>Quiet stop on the way up to the hills</td></tr>
+        <tr><td>Almora</td><td class="muted">2023</td><td>Kumaon hills, clear Himalaya views</td></tr>
+        <tr><td>Nainital</td><td class="muted">2023</td><td>Lake town, classic hill station</td></tr>
+        <tr><td>Bhimtal</td><td class="muted">2024</td><td>Quieter cousin of Nainital</td></tr>
+        <tr><td>Pristine Peaks</td><td class="muted">2024</td><td>Mountain retreat, worth the climb</td></tr>
+        <tr><td>Ahmedabad</td><td class="muted">2024</td><td>Heritage city, great street food</td></tr>
+        <tr><td>Lucknow</td><td class="muted">2024</td><td>Nawabi architecture and biryani</td></tr>
+        <tr><td>Ranthambore</td><td class="muted">2026</td><td>Tiger spotting on safari</td></tr>
+        <tr><td>Gir National Park</td><td class="muted">2026</td><td>Home to the last wild Asiatic lions</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="now reveal">
+    <div class="eyebrow">Right now</div>
+    <div class="now-grid">
+      <div class="now-card">
+        <div class="label">Building</div>
+        <h3>NGO Website & Discord Bot</h3>
+        <p>Splitting time between a website for an NGO and the Discord organizer bot.</p>
+      </div>
+      <div class="now-card">
+        <div class="label">Reading</div>
+        <h3>Concepts of Physics — H.C. Verma</h3>
+        <p>Working through it problem by problem.</p>
+      </div>
+      <div class="now-card">
+        <div class="label">Toolkit</div>
+        <h3>VS Code, Git & GitHub, Node.js</h3>
+        <p>VS Code as the daily driver, Git/GitHub for version control, Discord.js for the bot, and Python for scripting and experiments.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact reveal" id="contact">
+    <div class="eyebrow">Get in touch</div>
+    <h2>Say hello, or send a project brief.</h2>
+    <p class="sub">Always up for talking about a new project, an internship, or just airplanes. If you're building something interesting — or want to swap plane-spotting stories — drop a line.</p>
+    <div class="links">
+      <a href="mailto:dakshc3109@gmail.com">dakshc3109@gmail.com</a>
+      <a href="https://github.com/dakshc3109" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+      <a href="https://www.linkedin.com/in/daksh-chaudhary-3291a8286?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2026 Daksh Chaudhary</span>
+    <span>Built with care, somewhere between a runway and a keyboard</span>
+  </footer>
+
+<script>
+  // live-ish UTC clock in the status strip
+  function tick(){
+    const now = new Date();
+    const hh = String(now.getUTCHours()).padStart(2,'0');
+    const mm = String(now.getUTCMinutes()).padStart(2,'0');
+    const ss = String(now.getUTCSeconds()).padStart(2,'0');
+    const el = document.getElementById('clock');
+    if(el) el.textContent = `DEL 28.61°N 77.21°E · ${hh}:${mm}:${ss} UTC`;
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  // in-page scroll for CTA buttons (avoids href="#..." being treated as external nav)
+  document.querySelectorAll('[data-scroll]').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      e.preventDefault();
+      const target = document.getElementById(el.getAttribute('data-scroll'));
+      if(target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // scroll reveal
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('in');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
