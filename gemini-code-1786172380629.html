@@ -1,0 +1,2092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DAKSH — Flight Deck | Personal Portfolio</title>
+  <meta name="description" content="Daksh — Student, Software Engineer and Aviation Obsessive." />
+  <meta name="theme-color" content="#081116" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #081116;
+      --bg-2: #0b151b;
+      --panel: #101b21;
+      --panel-2: #142228;
+      --cream: #f2ebdd;
+      --muted: #9ba7a8;
+      --orange: #ff6b35;
+      --orange-glow: rgba(255, 107, 53, 0.25);
+      --green: #8fcb9b;
+      --line: #29383e;
+      --line-bright: rgba(255, 255, 255, 0.12);
+      --danger: #ff5b5b;
+      --accent: var(--orange);
+      --accent-glow: var(--orange-glow);
+
+      --max: 1280px;
+      --ease: cubic-bezier(.16, 1, .3, 1);
+    }
+
+    /* DEV & EMERGENCY MODE OVERRIDES */
+    body.mode-dev {
+      --bg: #040d12;
+      --panel: #091a24;
+      --panel-2: #0e2433;
+      --accent: #00e5ff;
+      --accent-glow: rgba(0, 229, 255, 0.3);
+      --line: #16425b;
+    }
+
+    body.mode-emergency {
+      --bg: #140505;
+      --panel: #240a0a;
+      --panel-2: #330e0e;
+      --accent: #ff3333;
+      --accent-glow: rgba(255, 51, 51, 0.4);
+      --line: #5b1616;
+      animation: emergencyPulse 2s infinite ease-in-out;
+    }
+
+    @keyframes emergencyPulse {
+      0%, 100% { background-color: #140505; }
+      50% { background-color: #1f0707; }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--cream);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+      cursor: default;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.4s var(--ease);
+    }
+
+    /* Subtle HUD Grid Overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .35;
+      z-index: 100;
+      background:
+        linear-gradient(rgba(255,255,255,.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.015) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    ::selection {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .mono {
+      font-family: "Space Mono", monospace;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    /* =========================================================
+       CURSOR
+    ========================================================= */
+
+    @media (hover: hover) and (pointer: fine) {
+      .cursor {
+        position: fixed;
+        width: 18px;
+        height: 18px;
+        border: 1px solid var(--accent);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        transform: translate(-50%, -50%);
+        transition: width .2s var(--ease), height .2s var(--ease), background .2s ease, border-color .2s;
+        mix-blend-mode: difference;
+      }
+
+      .cursor.active {
+        width: 44px;
+        height: 44px;
+        background: var(--accent-glow);
+        border-color: var(--accent);
+      }
+    }
+
+    /* =========================================================
+       LOADER
+    ========================================================= */
+
+    .loader {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 9998;
+      display: grid;
+      place-items: center;
+      transition: opacity .6s var(--ease), visibility .6s;
+    }
+
+    .loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loader-inner {
+      width: min(420px, 85vw);
+    }
+
+    .loader-top {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font: 11px "Space Mono", monospace;
+      color: var(--accent);
+      letter-spacing: .12em;
+    }
+
+    .loader-bar {
+      height: 2px;
+      background: var(--line);
+      overflow: hidden;
+      border-radius: 2px;
+    }
+
+    .loader-progress {
+      width: 0%;
+      height: 100%;
+      background: var(--accent);
+      box-shadow: 0 0 12px var(--accent);
+      transition: width 0.1s linear;
+    }
+
+    /* =========================================================
+       NAVBAR
+    ========================================================= */
+
+    .nav {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(var(--max), calc(100% - 32px));
+      height: 56px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px 0 20px;
+      background: rgba(8, 17, 22, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--line-bright);
+      border-radius: 999px;
+      transition: border-color .3s;
+    }
+
+    .brand {
+      font: 700 13px "Space Mono", monospace;
+      letter-spacing: .08em;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-tag {
+      font-size: 10px;
+      background: var(--panel-2);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 4px;
+    }
+
+    .nav-link {
+      padding: 8px 14px;
+      border-radius: 999px;
+      font: 11px "Space Mono", monospace;
+      color: var(--muted);
+      transition: all .25s var(--ease);
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--cream);
+      background: var(--panel-2);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .zulu-clock {
+      font: 700 11px "Space Mono", monospace;
+      color: var(--accent);
+      background: rgba(255, 107, 53, 0.08);
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 107, 53, 0.2);
+    }
+
+    .availability {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: var(--green);
+      color: var(--bg);
+      font: 700 10px "Space Mono", monospace;
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: blink 1.5s infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: .25; }
+    }
+
+    .mobile-toggle {
+      display: none;
+      padding: 8px 12px;
+      font-size: 18px;
+      color: var(--cream);
+    }
+
+    .mobile-nav-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 17, 22, 0.95);
+      backdrop-filter: blur(25px);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s var(--ease);
+    }
+
+    .mobile-nav-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mobile-nav-overlay .nav-link {
+      font-size: 16px;
+      padding: 12px 24px;
+    }
+
+    @media (max-width: 960px) {
+      .nav-links, .availability, .zulu-clock {
+        display: none;
+      }
+      .mobile-toggle {
+        display: block;
+      }
+    }
+
+    /* =========================================================
+       PAGE STRUCTURE & SECTIONS
+    ========================================================= */
+
+    main {
+      width: min(var(--max), calc(100% - 32px));
+      margin: auto;
+    }
+
+    section {
+      position: relative;
+      padding-top: 120px;
+      scroll-margin-top: 80px;
+    }
+
+    .section-heading {
+      margin-bottom: 40px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font: 700 11px "Space Mono", monospace;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    .section-heading h2 {
+      max-width: 850px;
+      font-size: clamp(32px, 4.5vw, 56px);
+      line-height: 1.02;
+      letter-spacing: -.04em;
+      margin-bottom: 16px;
+    }
+
+    .section-heading p {
+      color: var(--muted);
+      max-width: 680px;
+      line-height: 1.65;
+      font-size: 15px;
+    }
+
+    /* =========================================================
+       HERO
+    ========================================================= */
+
+    .hero {
+      min-height: 90vh;
+      padding-top: 110px;
+      display: flex;
+      align-items: center;
+    }
+
+    .hero-card {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 85% 30%, var(--accent-glow), transparent 55%),
+        var(--bg-2);
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+      transition: border-color 0.4s;
+    }
+
+    .hero-top-bar {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 32px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(0, 0, 0, 0.25);
+      font: 700 10px "Space Mono", monospace;
+      letter-spacing: .08em;
+    }
+
+    .mode-switch-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mode-btn {
+      padding: 4px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--muted);
+      font: 700 9px "Space Mono", monospace;
+      transition: all 0.2s ease;
+    }
+
+    .mode-btn:hover {
+      color: var(--cream);
+      border-color: var(--accent);
+    }
+
+    .mode-btn.active {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .squawk-code {
+      color: var(--accent);
+    }
+
+    .hero-copy {
+      padding: 48px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hero-kicker {
+      color: var(--accent);
+      font: 700 11px "Space Mono", monospace;
+      letter-spacing: .12em;
+      margin-bottom: 16px;
+    }
+
+    .hero-title {
+      font-size: clamp(56px, 8.5vw, 115px);
+      line-height: .82;
+      letter-spacing: -.07em;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .hero-role {
+      color: var(--accent);
+      font: 700 12px "Space Mono", monospace;
+      letter-spacing: .05em;
+      margin-bottom: 20px;
+    }
+
+    .hero-tagline {
+      font-size: clamp(22px, 2.5vw, 36px);
+      line-height: 1.15;
+      letter-spacing: -.04em;
+      max-width: 620px;
+      margin-bottom: 18px;
+      font-weight: 600;
+    }
+
+    .hero-description {
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.65;
+      font-size: 14.5px;
+      margin-bottom: 28px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--cream);
+      padding: 13px 22px;
+      border-radius: 999px;
+      font: 700 11px "Space Mono", monospace;
+      letter-spacing: .04em;
+      overflow: hidden;
+      transition: transform .25s var(--ease), background .25s, color .25s, border-color .25s;
+    }
+
+    .btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: var(--accent);
+      transform: translateY(100%);
+      transition: transform .3s var(--ease);
+      z-index: 0;
+    }
+
+    .btn span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      color: var(--bg);
+      border-color: var(--accent);
+    }
+
+    .btn:hover::before {
+      transform: translateY(0);
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+    }
+
+    .btn.primary::before {
+      background: var(--cream);
+    }
+
+    .atc-cli {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 12px 16px;
+      font: 12px "Space Mono", monospace;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .atc-cli-header {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 9px;
+    }
+
+    .atc-cli-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+    }
+
+    .atc-cli-input {
+      background: transparent;
+      border: none;
+      color: var(--cream);
+      font: 12px "Space Mono", monospace;
+      width: 100%;
+      outline: none;
+    }
+
+    .atc-cli-response {
+      color: var(--muted);
+      font-size: 11px;
+      min-height: 16px;
+    }
+
+    /* =========================================================
+       PFD HUD
+    ========================================================= */
+
+    .pfd-container {
+      padding: 32px;
+      display: grid;
+      place-items: center;
+      background: rgba(0,0,0,0.25);
+      border-left: 1px solid var(--line);
+      position: relative;
+    }
+
+    .pfd-deck {
+      width: 100%;
+      max-width: 420px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--panel);
+      padding: 24px;
+      position: relative;
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .horizon-box {
+      width: 100%;
+      height: 180px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #060e12;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .horizon-svg {
+      width: 100%;
+      height: 100%;
+      transition: transform 0.1s linear;
+    }
+
+    .horizon-reticle {
+      position: absolute;
+      width: 60px;
+      height: 2px;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      pointer-events: none;
+    }
+
+    .horizon-reticle::before,
+    .horizon-reticle::after {
+      content: "";
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border: 2px solid var(--accent);
+      top: -5px;
+    }
+
+    .horizon-reticle::before { left: -10px; border-right: none; border-bottom: none; }
+    .horizon-reticle::after { right: -10px; border-left: none; border-bottom: none; }
+
+    .pfd-telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      background: rgba(0,0,0,0.3);
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+    }
+
+    .pfd-tape {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .pfd-tape-label {
+      font: 700 9px "Space Mono", monospace;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .pfd-tape-val {
+      font: 700 18px "Space Mono", monospace;
+      line-height: 1;
+    }
+
+    .pfd-tape-unit {
+      font-size: 9px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .pfd-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .radar-box {
+      width: 80px;
+      height: 80px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      position: relative;
+      overflow: hidden;
+      background: rgba(0,0,0,0.4);
+      cursor: pointer;
+    }
+
+    .radar-sweep-line {
+      position: absolute;
+      width: 50%;
+      height: 2px;
+      background: var(--accent);
+      left: 50%;
+      top: 50%;
+      transform-origin: left;
+      animation: radarScan 3s linear infinite;
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    @keyframes radarScan {
+      to { transform: rotate(360deg); }
+    }
+
+    .radar-blip {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--accent);
+      left: 65%;
+      top: 35%;
+      box-shadow: 0 0 6px var(--accent);
+      animation: blipPulse 2s infinite;
+    }
+
+    @keyframes blipPulse {
+      50% { opacity: 0.2; transform: scale(0.7); }
+    }
+
+    .pfd-status-block {
+      text-align: right;
+    }
+
+    .pfd-status-title {
+      font: 700 10px "Space Mono", monospace;
+      color: var(--muted);
+    }
+
+    .pfd-status-state {
+      font: 700 14px "Space Mono", monospace;
+      color: var(--green);
+    }
+
+    /* =========================================================
+       BOARDING PASS (ABOUT)
+    ========================================================= */
+
+    .boarding-pass {
+      background: var(--cream);
+      color: #121c22;
+      border-radius: 20px;
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      min-height: 400px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      transition: transform .4s var(--ease);
+      position: relative;
+      mask-image: 
+        radial-gradient(circle 14px at calc(100% - 280px) 0, transparent 99%, #000 100%),
+        radial-gradient(circle 14px at calc(100% - 280px) 100%, transparent 99%, #000 100%);
+      mask-composite: intersect;
+      -webkit-mask-image: 
+        radial-gradient(circle 14px at calc(100% - 280px) 0, transparent 99%, #000 100%),
+        radial-gradient(circle 14px at calc(100% - 280px) 100%, transparent 99%, #000 100%);
+      -webkit-mask-composite: destination-in;
+    }
+
+    .boarding-pass:hover {
+      transform: translateY(-4px);
+    }
+
+    .pass-header-strip {
+      grid-column: 1 / -1;
+      background: #101b21;
+      color: var(--cream);
+      padding: 12px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font: 700 10px "Space Mono", monospace;
+      letter-spacing: .12em;
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .pass-main {
+      padding: 32px 36px 36px 36px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .pass-side {
+      border-left: 2px dashed rgba(18,28,34, 0.25);
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.025);
+      position: relative;
+    }
+
+    .pass-stamp {
+      position: absolute;
+      border: 2px dashed rgba(255, 107, 53, 0.8);
+      color: rgba(255, 107, 53, 0.85);
+      font-family: "Space Mono", monospace;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 6px;
+      pointer-events: none;
+      user-select: none;
+      letter-spacing: .1em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.1;
+      background: rgba(255, 107, 53, 0.03);
+    }
+
+    .stamp-1 {
+      top: 25px;
+      right: 40px;
+      transform: rotate(-12deg);
+      font-size: 10px;
+    }
+
+    .stamp-2 {
+      bottom: 85px;
+      right: 40px;
+      border-style: double;
+      border-width: 3px;
+      border-radius: 50px;
+      color: rgba(40, 140, 75, 0.85);
+      border-color: rgba(40, 140, 75, 0.75);
+      transform: rotate(8deg);
+      font-size: 9px;
+      padding: 6px 14px;
+    }
+
+    .pass-label {
+      font: 700 10px "Space Mono", monospace;
+      color: #e65100;
+      letter-spacing: .1em;
+      margin-bottom: 6px;
+    }
+
+    .pass-value {
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -.04em;
+      line-height: 1;
+      color: #121c22;
+    }
+
+    .pass-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .pass-intro {
+      font: 700 16px "Space Mono", monospace;
+      margin-bottom: 12px;
+      color: #121c22;
+    }
+
+    .pass-description {
+      max-width: 620px;
+      color: #3a454a;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .barcode {
+      height: 46px;
+      background: repeating-linear-gradient(
+        90deg,
+        #121c22 0,
+        #121c22 2px,
+        transparent 2px,
+        transparent 5px,
+        #121c22 5px,
+        #121c22 7px,
+        transparent 7px,
+        transparent 11px
+      );
+      margin-top: 24px;
+      opacity: .9;
+    }
+
+    /* =========================================================
+       PROJECTS
+    ========================================================= */
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .project {
+      min-height: 360px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--panel);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: transform .35s var(--ease), border-color .35s, background .35s;
+    }
+
+    .project::before {
+      content: "";
+      position: absolute;
+      width: 3px;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background: var(--accent);
+      transform: scaleY(0);
+      transform-origin: bottom;
+      transition: transform .35s var(--ease);
+    }
+
+    .project:hover {
+      transform: translateY(-8px);
+      border-color: var(--accent);
+      background: var(--panel-2);
+    }
+
+    .project:hover::before {
+      transform: scaleY(1);
+    }
+
+    .project-number {
+      color: var(--accent);
+      font: 700 11px "Space Mono", monospace;
+      margin-bottom: 28px;
+    }
+
+    .project h3 {
+      font-size: 24px;
+      letter-spacing: -.03em;
+      margin-bottom: 14px;
+    }
+
+    .project p {
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .project-stack {
+      margin-top: auto;
+      color: var(--accent);
+      font: 11px "Space Mono", monospace;
+      margin-bottom: 20px;
+    }
+
+    /* =========================================================
+       SYSTEMS & AVIONICS
+    ========================================================= */
+
+    .systems-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .system {
+      padding: 28px;
+      min-height: 150px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+      position: relative;
+      overflow: hidden;
+      transition: transform .3s var(--ease), border-color .3s;
+    }
+
+    .system:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+
+    .system::after {
+      content: "◉";
+      position: absolute;
+      right: 24px;
+      top: 24px;
+      color: var(--accent);
+      font-size: 12px;
+      animation: blink 1.8s infinite;
+    }
+
+    .system-label {
+      color: var(--accent);
+      font: 700 10px "Space Mono", monospace;
+      margin-bottom: 14px;
+    }
+
+    .system h3 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .system p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* =========================================================
+       SECTION 05: TOP SPOTTED AIRCRAFT LOG
+    ========================================================= */
+
+    .spotting-cards-container {
+      margin-top: 12px;
+    }
+
+    .spotting-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    .spotting-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: transform .3s var(--ease), border-color .3s;
+    }
+
+    .spotting-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+    }
+
+    .spotting-card-tag {
+      font: 700 10px "Space Mono", monospace;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .spotting-card h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+      letter-spacing: -.02em;
+    }
+
+    .spotting-card p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .spotting-action-center {
+      text-align: center;
+    }
+
+    .spotting-action-center .btn {
+      background: var(--panel);
+      color: var(--cream);
+      border-color: var(--line);
+      padding: 14px 32px;
+    }
+
+    .spotting-action-center .btn::before {
+      background: var(--accent);
+    }
+
+    /* =========================================================
+       SECTION 06: AVIATION & SPOTTING (THE OTHER HALF OF THE COCKPIT)
+    ========================================================= */
+
+    .aviation-log {
+      background: var(--cream);
+      color: var(--bg);
+      border-radius: 22px;
+      padding: 48px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      margin-bottom: 24px;
+    }
+
+    .aviation-log h2 {
+      font-size: clamp(32px, 3.8vw, 48px);
+      line-height: 1;
+      letter-spacing: -.04em;
+      margin-bottom: 20px;
+    }
+
+    .aviation-log p {
+      color: #4a5458;
+      line-height: 1.75;
+      max-width: 540px;
+    }
+
+    .observations {
+      display: grid;
+      gap: 16px;
+    }
+
+    .observation {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(8,17,22,.12);
+    }
+
+    .observation-number {
+      color: var(--orange);
+      font: 700 11px "Space Mono", monospace;
+    }
+
+    .observation h3 {
+      margin-bottom: 4px;
+      font-size: 18px;
+    }
+
+    .observation p {
+      font-size: 13px;
+    }
+
+    /* =========================================================
+       SECTION 07: CONTACT
+    ========================================================= */
+
+    .contact {
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--panel);
+      padding: 60px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+
+    .contact h2 {
+      font-size: clamp(40px, 6.5vw, 84px);
+      line-height: .9;
+      letter-spacing: -.06em;
+      margin-bottom: 48px;
+      max-width: 720px;
+    }
+
+    .contact-meta {
+      display: flex;
+      gap: 80px;
+      margin-bottom: 36px;
+    }
+
+    .contact-item span {
+      display: block;
+      color: var(--accent);
+      font: 700 10px "Space Mono", monospace;
+      margin-bottom: 8px;
+    }
+
+    .contact-item a, .contact-item div {
+      font: 600 16px "Space Mono", monospace;
+    }
+
+    .contact-item a:hover {
+      text-decoration: underline;
+    }
+
+    /* =========================================================
+       FOOTER
+    ========================================================= */
+
+    footer {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 80px auto 30px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font: 10px "Space Mono", monospace;
+    }
+
+    /* =========================================================
+       MODAL
+    ========================================================= */
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 7, 10, 0.85);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      z-index: 5000;
+      display: grid;
+      place-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .35s var(--ease), visibility .35s;
+    }
+
+    .modal.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-card {
+      width: min(850px, calc(100% - 32px));
+      max-height: 85vh;
+      overflow-y: auto;
+      background: var(--cream);
+      color: var(--bg);
+      border-radius: 24px;
+      padding: 44px;
+      transform: translateY(24px) scale(.98);
+      transition: transform .4s var(--ease);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    }
+
+    .modal.open .modal-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 36px;
+    }
+
+    .modal-close {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--bg);
+      color: var(--cream);
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      transition: transform .25s var(--ease);
+    }
+
+    .modal-close:hover {
+      transform: rotate(90deg);
+    }
+
+    .modal h2 {
+      font-size: clamp(32px, 4.5vw, 54px);
+      line-height: .95;
+      letter-spacing: -.05em;
+    }
+
+    .modal-copy {
+      color: #4a5458;
+      line-height: 1.75;
+      max-width: 680px;
+      margin-bottom: 32px;
+      font-size: 15px;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .modal-stat {
+      padding: 18px;
+      background: #e2dac9;
+      border-radius: 12px;
+    }
+
+    .modal-stat span {
+      display: block;
+      color: var(--orange);
+      font: 700 9px "Space Mono", monospace;
+      margin-bottom: 6px;
+    }
+
+    .modal-stat strong {
+      font-size: 14px;
+    }
+
+    .spotting-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .spotting-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: #e2dac9;
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .spotting-item span {
+      color: var(--orange);
+      font-family: "Space Mono", monospace;
+      font-size: 12px;
+    }
+
+    /* =========================================================
+       SCROLL REVEAL
+    ========================================================= */
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .8s var(--ease), transform .8s var(--ease);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        padding-top: 90px;
+      }
+      .hero-card {
+        grid-template-columns: 1fr;
+      }
+      .pfd-container {
+        border-left: none;
+        border-top: 1px solid var(--line);
+        padding: 24px;
+      }
+      .projects-grid, .systems-grid, .spotting-cards-grid, .boarding-pass, .aviation-log {
+        grid-template-columns: 1fr;
+      }
+      .boarding-pass {
+        mask-image: none;
+        -webkit-mask-image: none;
+      }
+      .pass-side {
+        border-left: 0;
+        border-top: 2px dashed rgba(18,28,34, 0.25);
+      }
+      .stamp-1, .stamp-2 {
+        display: none;
+      }
+      .contact {
+        padding: 32px;
+      }
+      .contact-meta {
+        flex-direction: column;
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="loader" id="loader" aria-hidden="false">
+    <div class="loader-inner">
+      <div class="loader-top">
+        <span>DF-01 / INITIALIZING PFD</span>
+        <span id="loaderPercent">00%</span>
+      </div>
+      <div class="loader-bar">
+        <div class="loader-progress" id="loaderProgress"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cursor" id="cursor"></div>
+
+  <header>
+    <nav class="nav" aria-label="Main Navigation">
+      <a href="#top" class="brand">
+        DF / FLIGHT DECK <span class="brand-tag">v2.7</span>
+      </a>
+
+      <div class="nav-links">
+        <button class="nav-link active" data-scroll="about">ABOUT</button>
+        <button class="nav-link" data-scroll="projects">PROJECTS</button>
+        <button class="nav-link" data-scroll="systems">SYSTEMS</button>
+        <button class="nav-link" data-scroll="aviation">LOG</button>
+        <button class="nav-link" data-scroll="contact">CONTACT</button>
+      </div>
+
+      <div class="nav-right">
+        <div class="zulu-clock" id="zuluClock">00:00:00 Z</div>
+        <div class="availability">
+          <span class="status-dot"></span>
+          SYSTEMS NOMINAL
+        </div>
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation menu">☰</button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="mobile-nav-overlay" id="mobileNavOverlay">
+    <button class="nav-link" data-scroll="about">ABOUT</button>
+    <button class="nav-link" data-scroll="projects">PROJECTS</button>
+    <button class="nav-link" data-scroll="systems">SYSTEMS</button>
+    <button class="nav-link" data-scroll="aviation">LOG</button>
+    <button class="nav-link" data-scroll="contact">CONTACT</button>
+  </div>
+
+  <main id="top">
+
+    <section class="hero">
+      <div class="hero-card reveal">
+        
+        <div class="hero-top-bar">
+          <div>AIRCRAFT / NODE: <span class="mono">DF-01</span></div>
+          <div class="mode-switch-group">
+            <span>MODE:</span>
+            <button class="mode-btn active" id="btnModeProd">PROD</button>
+            <button class="mode-btn" id="btnModeDev">DEV</button>
+            <button class="mode-btn" id="btnModeEmergency">EMERGENCY 7700</button>
+          </div>
+          <div>SQUAWK: <span class="squawk-code mono" id="squawkDisplay">7000</span></div>
+        </div>
+
+        <div class="hero-copy">
+          <div class="hero-kicker">COMPUTER SCIENCE / AVIONICS DECK</div>
+          <h1 class="hero-title">DAKSH</h1>
+          <div class="hero-role">SOFTWARE ENGINEER · STUDENT · AVIATION OBSESSIVE</div>
+          
+          <div class="hero-tagline">
+            Engineering digital systems.
+            <br>
+            Keeping eyes on the sky.
+          </div>
+
+          <p class="hero-description">
+            Architecting robust software interfaces and backend pipelines with the precision, redundancy, and visual discipline of modern aerospace avionics.
+          </p>
+
+          <div class="hero-buttons">
+            <button class="btn primary" data-scroll="projects">
+              <span>EXPLORE PROJECTS</span>
+            </button>
+            <button class="btn" data-scroll="contact">
+              <span>CONTACT GROUND</span>
+            </button>
+          </div>
+
+          <div class="atc-cli">
+            <div class="atc-cli-header">
+              <span>TRANSCEIVER CLI (ATC RADIO)</span>
+              <span>FREQ: 118.275 MHz</span>
+            </div>
+            <div class="atc-cli-input-wrap">
+              <span>&gt;</span>
+              <input type="text" class="atc-cli-input" id="cliInput" placeholder="Type 'help', 'github', or 'squawk 7700'..." autocomplete="off" spellcheck="false" />
+            </div>
+            <div class="atc-cli-response" id="cliResponse">Radio linked. Standing by for command...</div>
+          </div>
+        </div>
+
+        <div class="pfd-container">
+          <div class="pfd-deck" id="pfdDeck">
+            
+            <div class="horizon-box">
+              <svg class="horizon-svg" id="horizonSvg" viewBox="0 0 200 200">
+                <rect x="-100" y="-100" width="400" height="200" fill="#113344" />
+                <rect x="-100" y="100" width="400" height="200" fill="#221810" />
+                <line x1="-100" y1="100" x2="300" y2="100" stroke="var(--accent)" stroke-width="2" />
+                <line x1="70" y1="70" x2="130" y2="70" stroke="#ffffff" stroke-width="1" opacity="0.5" />
+                <line x1="80" y1="85" x2="120" y2="85" stroke="#ffffff" stroke-width="1" opacity="0.5" />
+                <line x1="80" y1="115" x2="120" y2="115" stroke="#ffffff" stroke-width="1" opacity="0.5" />
+                <line x1="70" y1="130" x2="130" y2="130" stroke="#ffffff" stroke-width="1" opacity="0.5" />
+              </svg>
+              <div class="horizon-reticle"></div>
+            </div>
+
+            <div class="pfd-telemetry-grid">
+              <div class="pfd-tape">
+                <div class="pfd-tape-label">CPU LOAD</div>
+                <div class="pfd-tape-val" id="cpuVal">14%</div>
+                <div class="pfd-tape-unit">3.4 GHz</div>
+              </div>
+              <div class="pfd-tape">
+                <div class="pfd-tape-label">THROUGHPUT</div>
+                <div class="pfd-tape-val" id="reqVal">487</div>
+                <div class="pfd-tape-unit">REQ / SEC</div>
+              </div>
+              <div class="pfd-tape">
+                <div class="pfd-tape-label">LATENCY</div>
+                <div class="pfd-tape-val" id="latVal">12</div>
+                <div class="pfd-tape-unit">MS</div>
+              </div>
+            </div>
+
+            <div class="pfd-bottom">
+              <div class="radar-box" id="pfdRadar" title="Radar Vector">
+                <div class="radar-sweep-line"></div>
+                <div class="radar-blip"></div>
+              </div>
+
+              <div class="pfd-status-block">
+                <div class="pfd-status-title">SYSTEM STATE</div>
+                <div class="pfd-status-state" id="systemState">NOMINAL</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="section-heading reveal">
+        <div class="eyebrow">01 — ABOUT / BOARDING PASS</div>
+        <h2>Engineer by craft.<br>Aviation by obsession.</h2>
+        <p>The fastest way to understand me is to look at what I choose to build — and what makes me look at the skies.</p>
+      </div>
+
+      <div class="boarding-pass reveal">
+        <div class="pass-header-strip">
+          <span>✈️ AIRWAYS DECK · BOARDING PASS</span>
+          <span>FIRST CLASS</span>
+          <span>FLIGHT DF-01</span>
+        </div>
+
+        <div class="pass-main">
+          <div class="pass-stamp stamp-1">
+            <span>CLEARED</span>
+            <span>DELHI CONTROL · 2026</span>
+          </div>
+
+          <div class="pass-stamp stamp-2">
+            <span>INSPECTED &amp; PASSED</span>
+            <span>FLIGHT DECK SYSTEM</span>
+          </div>
+
+          <div class="pass-grid">
+            <div>
+              <div class="pass-label">PASSENGER</div>
+              <div class="pass-value">DAKSH</div>
+            </div>
+            <div>
+              <div class="pass-label">FROM</div>
+              <div class="pass-value">CURIOSITY</div>
+            </div>
+            <div>
+              <div class="pass-label">TO</div>
+              <div class="pass-value">ENGINEERING</div>
+            </div>
+          </div>
+
+          <div class="pass-intro mono">STUDENT + SOFTWARE ENGINEER</div>
+          <p class="pass-description">
+            I started programming in 5th grade by building a simple website out of curiosity. That curiosity turned into years of learning through long-term courses, personal projects, and constantly exploring new technologies. Today, I'm focused on becoming a better software engineer while diving deeper into AI and building products that solve real problems.
+            <br><br>
+            Outside of coding, aviation has always been a huge interest of mine. I enjoy learning about aircraft and flight operations, tracking flights, and spending time around airports whenever I get the chance.
+          </p>
+          <div class="barcode" aria-hidden="true"></div>
+        </div>
+
+        <div class="pass-side">
+          <div>
+            <div class="pass-label">CALLSIGN</div>
+            <div class="pass-value mono">DF-01</div>
+          </div>
+          <div>
+            <div class="pass-label">BASE / GATE / SEAT</div>
+            <div class="pass-value mono" style="font-size: 18px; font-weight:700;">DELHI · G-12 · 01A</div>
+          </div>
+          <div>
+            <div class="pass-label">DEPARTURE TIME</div>
+            <div class="pass-value mono" style="font-size: 20px;">08:30 Z</div>
+          </div>
+          <div>
+            <div class="pass-label">STATUS</div>
+            <div class="pass-value mono" style="color: #e65100; font-size: 18px;">✈️ EN ROUTE</div>
+          </div>
+          <div>
+            <div class="pass-label">CURRENT MISSION</div>
+            <div class="pass-value mono" style="font-size: 12px; font-weight:700;">NGO Web Site · Discord Bot</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <div class="section-heading reveal">
+        <div class="eyebrow">02 — FLIGHT LOG / SELECTED PROJECTS</div>
+        <h2>Things I have shipped.</h2>
+        <p>Every project is a vector: an operational challenge, a structured system, and a calculated destination.</p>
+      </div>
+
+      <div class="projects-grid">
+        <article class="project reveal" data-project="alpha">
+          <div class="project-number">01</div>
+          <h3>PROJECT OPTIMUS</h3>
+          <p>A Discord bot that helps people organize things and creates a more user-friendly experience inside Discord. Currently under active development.</p>
+          <div class="project-stack">PYTHON · DISCORD.PY</div>
+          <button class="btn"><span>OPEN FLIGHT PLAN</span></button>
+        </article>
+
+        <article class="project reveal" data-project="vector">
+          <div class="project-number">02</div>
+          <h3>KIWTTER</h3>
+          <p>A place for people to join and talk — currently working on making the UI a lot better.</p>
+          <div class="project-stack">HTML · CSS · JAVASCRIPT</div>
+          <button class="btn"><span>OPEN FLIGHT PLAN</span></button>
+        </article>
+
+        <article class="project reveal" data-project="orbit">
+          <div class="project-number">03</div>
+          <h3>AI MARIO</h3>
+          <p>Developed an AI-enhanced Mario game based on the Linux Mario codebase. Integrated computer vision and facial tracking to enable hands-free gameplay by translating the player's facial movements into in-game controls.</p>
+          <div class="project-stack">HTML · CSS · JAVASCRIPT · PYTHON</div>
+          <button class="btn"><span>OPEN FLIGHT PLAN</span></button>
+        </article>
+      </div>
+    </section>
+
+    <section id="systems">
+      <div class="section-heading reveal">
+        <div class="eyebrow">03 — AVIONICS / SYSTEMS</div>
+        <h2>The instruments I work with.</h2>
+        <p>A robust stack organized like a modern glass cockpit: built for reliability, velocity, and focus.</p>
+      </div>
+
+      <div class="systems-grid">
+        <div class="system reveal">
+          <div class="system-label">FRONT-END</div>
+          <h3>React / Next.js / TypeScript</h3>
+          <p>Responsive design, modern state management, high-frequency updates, interactive UX.</p>
+        </div>
+
+        <div class="system reveal">
+          <div class="system-label">BACK-END</div>
+          <h3>Python / Node.js / APIs</h3>
+          <p>Microservices, asynchronous pipelines, data automation, scalable backend logic.</p>
+        </div>
+
+        <div class="system reveal">
+          <div class="system-label">DEV & TOOLS</div>
+          <h3>Git / Docker / Figma</h3>
+          <p>Containerization, seamless CI/CD, UI prototyping, system diagnostics.</p>
+        </div>
+
+        <div class="system reveal">
+          <div class="system-label">EXPLORING</div>
+          <h3>Distributed Systems / AI / 3D</h3>
+          <p>Expanding the operational horizon with modern WebGL shaders and LLM integrations.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="aviation">
+      <div class="section-heading reveal">
+        <div class="eyebrow">05 — FLIGHT LOG / SPOTTING</div>
+        <h2>Top Spotted Aircraft</h2>
+        <p>A catalog of notable aircraft sightings, captures, and logs tracked across various airports and flight routes.</p>
+      </div>
+
+      <div class="spotting-cards-container reveal">
+        <div class="spotting-cards-grid">
+          <div class="spotting-card">
+            <div class="spotting-card-tag">#01 — SPOTLIGHT LOG</div>
+            <h3>Boeing 777-300ER</h3>
+            <p>Air India · Captured at Delhi International Airport (DEL) during heavy departure sequence.</p>
+          </div>
+          <div class="spotting-card">
+            <div class="spotting-card-tag">#02 — SPOTLIGHT LOG</div>
+            <h3>Airbus A350-900</h3>
+            <p>IndiGo · Logged fresh widebody telemetry during final approach vector.</p>
+          </div>
+          <div class="spotting-card">
+            <div class="spotting-card-tag">#03 — SPOTLIGHT LOG</div>
+            <h3>Boeing 787-8 Dreamliner</h3>
+            <p>Vistara · Observed cruising overhead with signature raked wingtips.</p>
+          </div>
+        </div>
+
+        <div class="spotting-action-center">
+          <button class="btn primary" id="viewSpottingBtn">
+            <span>VIEW ALL SPOTTINGS (17 ITEMS)</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="aviation-log-section">
+      <div class="section-heading reveal" style="display: none;">
+        <div class="eyebrow">06 — AVIATION / THE OTHER HALF</div>
+      </div>
+
+      <div class="aviation-log reveal">
+        <div>
+          <div class="eyebrow">06 — PERSONAL LOG</div>
+          <h2>THE OTHER HALF OF THE COCKPIT</h2>
+          <p>
+            Aviation offers a masterclass in design discipline: redundancy, zero-fail interfaces, checklists, and controlled operations.
+            <br><br>
+            Every meter, light, and control surface exists for a clear, life-critical reason. I bring that same intent to software.
+          </p>
+        </div>
+
+        <div class="observations">
+          <div class="observation">
+            <div class="observation-number">01</div>
+            <div>
+              <h3>Cockpit Ergonomics</h3>
+              <p>Designing interfaces where critical data stands out instantly.</p>
+            </div>
+          </div>
+          <div class="observation">
+            <div class="observation-number">02</div>
+            <div>
+              <h3>Flight Planning</h3>
+              <p>Thorough preparation and contingency routes before executing code.</p>
+            </div>
+          </div>
+          <div class="observation">
+            <div class="observation-number">03</div>
+            <div>
+              <h3>Aerospace Artistry</h3>
+              <p>Complex mechanical systems functioning in harmony with sleek physics.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="section-heading reveal">
+        <div class="eyebrow">07 — DEPARTURE / CONTACT</div>
+        <h2>Ready for takeoff.</h2>
+        <p>Have an exciting project, internship opportunity, or engineering discussion? Let's connect.</p>
+      </div>
+
+      <div class="contact reveal">
+        <h2>LET'S BUILD<br>THE NEXT ROUTE.</h2>
+
+        <div class="contact-meta">
+          <div class="contact-item">
+            <span>EMAIL</span>
+            <a href="mailto:dakshc3109@gmail.com">dakshc3109@gmail.com</a>
+          </div>
+          <div class="contact-item">
+            <span>SOCIAL TELEMETRY</span>
+            <div>
+              <a href="https://github.com/dakshc3109" target="_blank" rel="noopener noreferrer">GitHub (@dakshc3109)</a> · <a href="hhttps://www.linkedin.com/in/daksh-chaudhary-3291a8286?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" rel="noopener noreferrer">LinkedIn(daksh)</a>
+            </div>
+          </div>
+        </div>
+
+        <a href="mailto:dakshc3109@gmail.com" class="btn primary">
+          <span>SEND TRANSMISSION</span>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>DF-01 / END OF TRANSMISSION</span>
+    <span>© 2026 DAKSH. ALL SYSTEMS NOMINAL.</span>
+  </footer>
+
+  <div class="modal" id="projectModal" aria-hidden="true" role="dialog">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <div class="eyebrow">FLIGHT PLAN / DETAIL</div>
+          <h2 id="modalTitle">PROJECT ALPHA</h2>
+        </div>
+        <button class="modal-close" id="modalClose" aria-label="Close dialog">×</button>
+      </div>
+
+      <p class="modal-copy" id="modalDescription"></p>
+
+      <div class="modal-grid" id="modalStatsGrid">
+        <div class="modal-stat">
+          <span>ROLE</span>
+          <strong id="modalRole">Engineering</strong>
+        </div>
+        <div class="modal-stat">
+          <span>STACK</span>
+          <strong id="modalStack">React / TypeScript</strong>
+        </div>
+        <div class="modal-stat">
+          <span>STATUS</span>
+          <strong>FLIGHT READY</strong>
+        </div>
+      </div>
+
+      <div id="spottingContainer" style="display: none;"></div>
+    </div>
+  </div>
+
+  <script>
+    'use strict';
+
+    /* LOADER SIMULATION */
+    const loader = document.getElementById("loader");
+    const loaderPercent = document.getElementById("loaderPercent");
+    const loaderProgress = document.getElementById("loaderProgress");
+    let percent = 0;
+    const loaderInterval = setInterval(() => {
+      percent += Math.floor(Math.random() * 12) + 6;
+      if (percent >= 100) {
+        percent = 100;
+        clearInterval(loaderInterval);
+        setTimeout(() => {
+          loader.classList.add("hidden");
+        }, 300);
+      }
+      loaderPercent.textContent = String(percent).padStart(2, "0") + "%";
+      loaderProgress.style.width = percent + "%";
+    }, 80);
+
+    /* ZULU CLOCK */
+    const zuluClock = document.getElementById("zuluClock");
+    function updateZuluClock() {
+      const now = new Date();
+      const hrs = String(now.getUTCHours()).padStart(2, '0');
+      const mins = String(now.getUTCMinutes()).padStart(2, '0');
+      const secs = String(now.getUTCSeconds()).padStart(2, '0');
+      zuluClock.textContent = `${hrs}:${mins}:${secs} Z`;
+    }
+    setInterval(updateZuluClock, 1000);
+    updateZuluClock();
+
+    /* CURSOR */
+    const cursor = document.getElementById("cursor");
+    if (cursor && window.matchMedia("(hover: hover)").matches) {
+      document.addEventListener("mousemove", e => {
+        cursor.style.left = `${e.clientX}px`;
+        cursor.style.top = `${e.clientY}px`;
+      });
+      document.querySelectorAll("button, a, .project, .system, .spotting-card, .mode-btn").forEach(el => {
+        el.addEventListener("mouseenter", () => cursor.classList.add("active"));
+        el.addEventListener("mouseleave", () => cursor.classList.remove("active"));
+      });
+    }
+
+    /* SMOOTH SCROLL */
+    function scrollToSection(id) {
+      const element = document.getElementById(id);
+      if (element) {
+        document.getElementById("mobileNavOverlay").classList.remove("open");
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+    document.querySelectorAll("[data-scroll]").forEach(btn => {
+      btn.addEventListener("click", () => scrollToSection(btn.dataset.scroll));
+    });
+
+    document.getElementById("mobileToggle").addEventListener("click", () => {
+      document.getElementById("mobileNavOverlay").classList.toggle("open");
+    });
+
+    /* ARTIFICIAL HORIZON ATTITUDE INTERACTIVITY */
+    const horizonSvg = document.getElementById("horizonSvg");
+    document.addEventListener("mousemove", e => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 30;
+      const y = (e.clientY / window.innerHeight - 0.5) * 40;
+      horizonSvg.style.transform = `rotate(${x}deg) translateY(${y}px)`;
+    });
+
+    /* OPERATIONAL MODES */
+    const btnProd = document.getElementById("btnModeProd");
+    const btnDev = document.getElementById("btnModeDev");
+    const btnEmergency = document.getElementById("btnModeEmergency");
+    const squawkDisplay = document.getElementById("squawkDisplay");
+    const systemState = document.getElementById("systemState");
+
+    function setMode(mode) {
+      document.body.classList.remove("mode-dev", "mode-emergency");
+      [btnProd, btnDev, btnEmergency].forEach(b => b.classList.remove("active"));
+
+      if (mode === "dev") {
+        document.body.classList.add("mode-dev");
+        btnDev.classList.add("active");
+        squawkDisplay.textContent = "1200";
+        systemState.textContent = "DEBUG";
+        systemState.style.color = "#00e5ff";
+      } else if (mode === "emergency") {
+        document.body.classList.add("mode-emergency");
+        btnEmergency.classList.add("active");
+        squawkDisplay.textContent = "7700";
+        systemState.textContent = "WARN / 7700";
+        systemState.style.color = "#ff3333";
+      } else {
+        btnProd.classList.add("active");
+        squawkDisplay.textContent = "7000";
+        systemState.textContent = "NOMINAL";
+        systemState.style.color = "var(--green)";
+      }
+    }
+
+    btnProd.addEventListener("click", () => setMode("prod"));
+    btnDev.addEventListener("click", () => setMode("dev"));
+    btnEmergency.addEventListener("click", () => setMode("emergency"));
+
+    /* TELEMETRY RANDOMIZER */
+    const cpuVal = document.getElementById("cpuVal");
+    const reqVal = document.getElementById("reqVal");
+    const latVal = document.getElementById("latVal");
+
+    setInterval(() => {
+      cpuVal.textContent = Math.floor(Math.random() * 18 + 12) + "%";
+      reqVal.textContent = Math.floor(Math.random() * 30 + 470);
+      latVal.textContent = Math.floor(Math.random() * 4 + 10);
+    }, 2000);
+
+    /* ATC RADIO TRANSCEIVER CLI */
+    const cliInput = document.getElementById("cliInput");
+    const cliResponse = document.getElementById("cliResponse");
+
+    cliInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        const cmd = cliInput.value.trim().toLowerCase();
+        cliInput.value = "";
+
+        if (cmd === "help") {
+          cliResponse.textContent = "Commands: [prod, dev, github, squawk 7700, projects, about, log, contact, clear]";
+        } else if (cmd === "github") {
+          window.open("https://github.com/dakshc3109", "_blank");
+          cliResponse.textContent = "Opening GitHub profile: https://github.com/dakshc3109";
+        } else if (cmd === "dev") {
+          setMode("dev");
+          cliResponse.textContent = "Mode switched to DEV (Squawk 1200).";
+        } else if (cmd === "prod") {
+          setMode("prod");
+          cliResponse.textContent = "Mode switched to PROD (Squawk 7000).";
+        } else if (cmd === "squawk 7700" || cmd === "emergency") {
+          setMode("emergency");
+          cliResponse.textContent = "EMERGENCY 7700 ACTIVATED. Hotfix pipeline standing by.";
+        } else if (cmd === "projects") {
+          scrollToSection("projects");
+          cliResponse.textContent = "Navigating to Projects...";
+        } else if (cmd === "about") {
+          scrollToSection("about");
+          cliResponse.textContent = "Navigating to About...";
+        } else if (cmd === "log" || cmd === "aviation") {
+          scrollToSection("aviation");
+          cliResponse.textContent = "Navigating to Aviation Log & Spotting...";
+        } else if (cmd === "contact") {
+          scrollToSection("contact");
+          cliResponse.textContent = "Navigating to Contact...";
+        } else if (cmd === "clear") {
+          cliResponse.textContent = "Radio linked. Standing by for command...";
+        } else {
+          cliResponse.textContent = `Unknown command: '${cmd}'. Type 'help' for options.`;
+        }
+      }
+    });
+
+    /* MODAL SYSTEM & PROJECTS */
+    const projects = {
+      alpha: {
+        title: "PROJECT OPTIMUS",
+        description: "A Discord bot that helps people organize things and creates a more user-friendly experience inside Discord. Currently under active development.",
+        role: "SOLO ENGINEERING",
+        stack: "PYTHON / DISCORD.PY",
+        status: "IN DEVELOPMENT"
+      },
+      vector: {
+        title: "KWITTER",
+        description: "A place for people to join and talk — currently working on making the UI a lot better.",
+        role: "SOLO ENGINEERING",
+        stack: "HTML / CSS / JAVASCRIPT / REACT",
+        status: "FLIGHT WORTHY"
+      },
+      orbit: {
+        title: "AI Mario",
+        description: "Developed an AI-enhanced Mario game based on the Linux Mario codebase. Integrated computer vision and facial tracking to enable hands-free gameplay by translating the player's facial movements into in-game controls.",
+        role: "SOLO ENGINEERING",
+        stack: "HTML / CSS / JAVASCRIPT / PYTHON",
+        status: "FLIGHT READY"
+      }
+    };
+
+    const spottingListItems = [
+      "Boeing 777-300ER (Air India) — Delhi (DEL)",
+      "Airbus A350-900 (IndiGo) — Delhi (DEL)",
+      "Boeing 787-8 Dreamliner (Vistara) — Mumbai (BOM)",
+      "Boeing 747-400F (Atlas Air) — Delhi (DEL)",
+      "Airbus A320neo (AirAsia India) — Bangalore (BLR)",
+      "Boeing 737 MAX 8 (Akasa Air) — Ahemdabad (AMD)",
+      "Airbus A380-800 (Emirates) — Delhi (DEL)",
+      "Airbus A321neo (Air India) — Delhi (DEL)",
+      "Tejas - Hindon Air Force Base (LCA) — Delhi (DEL)",
+      "Sukhoi Su-30MKI (Indian Air Force) — Hindon Air Force Base (DEL)",
+      "Mig-29 (Indian Air Force) — SKY",
+      "Boeing 737-800 (Air India Express) — Jaipur (JAI)",
+      "Airbus A319 (IndiGo) — Goa (GOI)",
+      "A320ceo (IndiGo) — Nepal (KTM)",
+      "C-130 Hercules (Indian Air Force) — Hindon Air Force Base (DEL)",
+      "C-17 Globemaster III (Indian Air Force) — Hindon Air Force Base (DEL)",
+    ];
+
+    const modal = document.getElementById("projectModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalDescription = document.getElementById("modalDescription");
+    const modalStatsGrid = document.getElementById("modalStatsGrid");
+    const spottingContainer = document.getElementById("spottingContainer");
+    const modalStatus = modal.querySelector(".modal-stat:nth-child(3) strong");
+
+    document.querySelectorAll(".project").forEach(card => {
+      card.addEventListener("click", () => {
+        const p = projects[card.dataset.project];
+        if (p) {
+          modalTitle.textContent = p.title;
+          modalDescription.textContent = p.description;
+          modalStatsGrid.style.display = "grid";
+          spottingContainer.style.display = "none";
+          document.getElementById("modalRole").textContent = p.role;
+          document.getElementById("modalStack").textContent = p.stack;
+          modalStatus.textContent = p.status;
+          modal.classList.add("open");
+        }
+      });
+    });
+
+    const viewSpottingBtn = document.getElementById("viewSpottingBtn");
+    if (viewSpottingBtn) {
+      viewSpottingBtn.addEventListener("click", () => {
+        modalTitle.textContent = "AIRCRAFT SPOTTING LOG";
+        modalDescription.textContent = "A complete catalog of notable aircraft sightings, captures, and logs tracked across various airports and flight routes.";
+        modalStatsGrid.style.display = "none";
+        spottingContainer.style.display = "block";
+        
+        let htmlContent = '<div class="spotting-list">';
+        spottingListItems.forEach((item, index) => {
+          const numStr = String(index + 1).padStart(2, '0');
+          htmlContent += `<div class="spotting-item"><span>#${numStr}</span> ${item}</div>`;
+        });
+        htmlContent += '</div>';
+        spottingContainer.innerHTML = htmlContent;
+
+        modal.classList.add("open");
+      });
+    }
+
+    document.getElementById("modalClose").addEventListener("click", () => modal.classList.remove("open"));
+
+    /* SCROLL OBSERVER */
+    const revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add("visible");
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll(".reveal").forEach(el => revealObserver.observe(el));
+  </script>
+</body>
+</html>
